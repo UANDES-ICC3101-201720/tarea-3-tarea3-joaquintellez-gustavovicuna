@@ -28,8 +28,8 @@ def threaded(c):
             break
   
         # reverse the given string from client 
-        data = data[::-1] 
-  
+        #data = data[::-1] 
+        Recibir_Mensaje(c)
         # send back reversed string to client 
         c.send(data) 
   
@@ -58,8 +58,8 @@ def Start_Server():
        print_lock.acquire()
        ip, port2 = str(addr[0]), str(addr[1])
        print 'Got connection from', ip,'at port',port2
-       Recibir_Mensaje(c)
-       start_new_thread(threaded, (c,)) 
+       start_new_thread(Recibir_Mensaje, (c,)) 
+       #Recibir_Mensaje(c)
     s.close()       
        
 def Recibir_Mensaje(c):
@@ -67,6 +67,12 @@ def Recibir_Mensaje(c):
        # Leyendo el mensaje:
        while True:
            mesage= c.recv(1024)
+           if not mesage: 
+            print('Chao') 
+              
+            # lock released on exit 
+            print_lock.release() 
+            break
            print 'Message recieved: '+ mesage
            mesage= mesage.split(',')
            syn, ack, modo, archivo= int(mesage[0]), int(mesage[1]), int(mesage[2]), mesage[3]
@@ -99,6 +105,8 @@ def Recibir_Mensaje(c):
            # 4. Si ya se terminó la comunicación:
            if (archivo=='chao'):
                break
+           
+        
 
        
                   
