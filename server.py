@@ -48,7 +48,10 @@ def Start_Server():
                   else:
                       syn=0
                       ack=0
+       mens = str(syn) + str(ack) + str(modo) + archivo              
+       c.send(mens)               
        print syn, ack, modo, archivo
+       continue
                   
 
 
