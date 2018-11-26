@@ -9,6 +9,32 @@ import socket
 import sys
 import json
 import traceback
+from thread import *
+import threading 
+  
+print_lock = threading.Lock() 
+  
+# thread fuction 
+def threaded(c): 
+    while True: 
+  
+        # data received from client 
+        data = c.recv(1024) 
+        if not data: 
+            print('Chao') 
+              
+            # lock released on exit 
+            print_lock.release() 
+            break
+  
+        # reverse the given string from client 
+        data = data[::-1] 
+  
+        # send back reversed string to client 
+        c.send(data) 
+  
+    # connection closed 
+    c.close() 
     
 
 def Start_Server():
@@ -29,9 +55,12 @@ def Start_Server():
     # Conectando con cliente:
     while True: 
        c, addr = s.accept()
+       print_lock.acquire()
        ip, port2 = str(addr[0]), str(addr[1])
        print 'Got connection from', ip,'at port',port2
-       Recibir_Mensaje(c)       
+       Recibir_Mensaje(c)
+       start_new_thread(threaded, (c,)) 
+    s.close()       
        
 def Recibir_Mensaje(c):
        
@@ -56,6 +85,7 @@ def Recibir_Mensaje(c):
                           print 'Error en handshake. Se perdió la conección?'
                   else:
                       print 'Asking for "' + archivo +'" to other hosts...'
+                      break
                       # TODO: Preguntar a demas clientes:
                       
                       
