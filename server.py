@@ -51,17 +51,23 @@ def Start_Server():
         sys.exit()
     s.listen(5)
     print 'Server now listening...'
+
+    threads = list()    
     
     # Conectando con cliente:
     while True: 
        c, addr = s.accept()
-       print_lock.acquire()
+       #print_lock.acquire()
        ip, port2 = str(addr[0]), str(addr[1])
        print 'Got connection from', ip,'at port',port2
-       start_new_thread(Recibir_Mensaje, (c,)) 
-       #Recibir_Mensaje(c)
+       t=threading.Thread(target=Recibir_Mensaje, args=(c,))
+       threads.append(t)
+       t.start()
     s.close()       
-       
+      
+      
+      
+      
 def Recibir_Mensaje(c):
        
        # Leyendo el mensaje:
@@ -95,16 +101,17 @@ def Recibir_Mensaje(c):
                       # TODO: Preguntar a demas clientes:
                       
                       
-           #3. Si es un archivo solicitado:
            else:
+               # 3. Si ya se terminó la comunicación:
+               if (archivo=='chao'):
+                   break
+               
+               #4. Si es un archivo solicitado:
                print 'Archivo '+ archivo + 'encontrado. Enviando a cliente que lo solicitó.'
                # TODO: Reenviar archivo a cliente que solicitó:
                
            
            
-           # 4. Si ya se terminó la comunicación:
-           if (archivo=='chao'):
-               break
            
         
 
