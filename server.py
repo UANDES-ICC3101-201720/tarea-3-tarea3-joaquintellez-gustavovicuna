@@ -9,7 +9,7 @@ import socket
 import sys
 import json
 import traceback
-    
+
 
 def Start_Server():
     
@@ -27,31 +27,43 @@ def Start_Server():
     print 'Server now listening...'
     
     # Conectando con cliente:
-    while True: 
-       c, addr = s.accept()
-       ip, port2 = str(addr[0]), str(addr[1])
-       print 'Got connection from', ip,'at port',port2
-       c.send('Thank you for connecting')
+    while True: #revisar
+        c, addr = s.accept()
+        ip, port2 = str(addr[0]), str(addr[1])
+        print 'Got connection from', ip,'at port',port2
+        c.send('Thank you for connecting')
+        #s.close()
+        
+        Recibir_mensaje(c)
+    
        
+def Recibir_mensaje(c):
        # Leyendo el mensaje:
-       while True:
-           mesage= c.recv(1024)
-           mesage= mesage.split(',')
-           syn, ack, modo, archivo= int(mesage[0]), int(mesage[1]), int(mesage[2]), mesage[3]
-           
-           #Accion dependiendo del mensaje:
-           #Si es un archivo:
-           if (modo==0):
-               # Verificando handshake:
-                  if (syn==1):
-                      if (ack==0):
-                          print 'Error with handshake. Sending message again.'
-                      else:
-                          syn=0
-                          ack=0
-           mens = str(syn) + ' ' + str(ack) + ' ' + str(modo) + ' ' + archivo              
-           c.send(mens)               
-           print syn, ack, modo, archivo
+       print 'Leyendo...'
+       
+       #c.send('Thank you for connecting')
+       #while True:
+        #   Recibir_mensaje(c)
+       #s.listen(5)
+       
+       mesage= c.recv(1024)
+       mesage= mesage.split(',')
+       syn, ack, modo, archivo= int(mesage[0]), int(mesage[1]), int(mesage[2]), mesage[3]
+       
+       #Accion dependiendo del mensaje:
+       #Si es un archivo:
+       if (modo==0):
+           # Verificando handshake:
+              if (syn==1):
+                  if (ack==0):
+                      print 'Error with handshake. Sending message again.'
+                  else:
+                      syn=0
+                      ack=0
+       mens = str(syn) + ' ' + str(ack) + ' ' + str(modo) + ' ' + archivo              
+       c.send(mens)               
+       print syn, ack, modo, archivo
+      
        
                   
 
@@ -59,3 +71,4 @@ def Start_Server():
 #Main:
 
 Start_Server()
+
