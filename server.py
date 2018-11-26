@@ -9,7 +9,7 @@ import socket
 import sys
 import json
 import traceback
-
+    
 
 def Start_Server():
     
@@ -27,43 +27,37 @@ def Start_Server():
     print 'Server now listening...'
     
     # Conectando con cliente:
-    while True: #revisar
-        c, addr = s.accept()
-        ip, port2 = str(addr[0]), str(addr[1])
-        print 'Got connection from', ip,'at port',port2
-        c.send('Thank you for connecting')
-        #s.close()
-        
-        Recibir_mensaje(c)
-    
+    while True: 
+       c, addr = s.accept()
+       ip, port2 = str(addr[0]), str(addr[1])
+       print 'Got connection from', ip,'at port',port2
+       Recibir_Mensaje(c)       
        
-def Recibir_mensaje(c):
+def Recibir_Mensaje(c):
+       
        # Leyendo el mensaje:
-       print 'Leyendo...'
-       
-       #c.send('Thank you for connecting')
-       #while True:
-        #   Recibir_mensaje(c)
-       #s.listen(5)
-       
-       mesage= c.recv(1024)
-       mesage= mesage.split(',')
-       syn, ack, modo, archivo= int(mesage[0]), int(mesage[1]), int(mesage[2]), mesage[3]
-       
-       #Accion dependiendo del mensaje:
-       #Si es un archivo:
-       if (modo==0):
-           # Verificando handshake:
-              if (syn==1):
-                  if (ack==0):
-                      print 'Error with handshake. Sending message again.'
+       while True:
+           mesage= c.recv(1024)
+           print 'Message recieved: '+ mesage
+           mesage= mesage.split(',')
+           syn, ack, modo, archivo= int(mesage[0]), int(mesage[1]), int(mesage[2]), mesage[3]
+           
+           #Accion dependiendo del mensaje:
+           #Si es una solicitud:
+           if (modo==1):
+               # Verificando handshake:
+                  if (syn==1):
+                      if (ack==0):
+                          syn=1
+                          ack=1
                   else:
-                      syn=0
-                      ack=0
-       mens = str(syn) + ' ' + str(ack) + ' ' + str(modo) + ' ' + archivo              
-       c.send(mens)               
-       print syn, ack, modo, archivo
-      
+                      if (ack==0):
+                          ack==1
+           if (archivo=='chao'):
+               break
+                      
+           mens = str(syn) + ',' + str(ack) + ',' + str(modo) + ',' + archivo              
+           c.send(mens)               
        
                   
 

@@ -8,35 +8,53 @@ Created on Sun Nov 25 22:08:34 2018
 
 import socket               # Import socket module
 
-def Recibir_mensaje():
+def Recibir_Mensaje():
+    
+    message=s.recv(1024)
+    print 'Recibiendo mensaje: '+ message
+    message= message.split(',')
+    syn, ack, modo, archivo= int(message[0]), int(message[1]), int(message[2]), message[3]
+    #Si es un handshake:
+    if (ack==1):
+        return 1
+    else:
+        # Si es una solicitud del server:
+        if (modo==1):
+            print 'Buscando archivo...'
+
+def Solicitar_Archivo(nombre):
     #s = socket.socket()
     #host = socket.gethostname()
     #port = 54321
     
     #s.connect((host,port))
-    return s.recv(1024)
- 
-def Enviar_mensaje(nombre):
-    #s = socket.socket()
-    #port = 54321
-    #host = socket.gethostname()
-    #s.connect((host,port))
-    s.send('0,0,1,'+nombre)
-    #s.listen(5)
-    #s.recv(1024)
-    
-    
+    s.send('1,0,1,'+ nombre)
+
+def Desconectar():
+    s.send('0,0,0,chao')
+    s.close()
+
+def Conectar():
+
+    host = socket.gethostname() # Get local machine name
+    port = 54321               # Reserve a port for your service.
+    s.connect((host, port))
+
+#Main:
 s = socket.socket()         # Create a socket object
-host = socket.gethostname() # Get local machine name
-port = 54321               # Reserve a port for your service.
+Conectar()
 
-s.connect((host, port))
-print s.recv(1024)
-
-#s.send('1,1,0,hola')
-
-Enviar_mensaje('texto.txt')
-print Recibir_mensaje()
-s.close()
-
-#print s.recv(1024)
+while True:
+    opc=input("1. Solicitar archivo\n0. Terminar conexión\n")
+    if opc==0:
+        Desconectar()
+        break
+    else:
+        n_archivo=raw_input("Ingrese nombre del archivo solicitado: ")
+        Solicitar_Archivo(n_archivo)
+        while True:
+            hs=Recibir_Mensaje()
+            if hs:
+                s.send('0,0,1,'+n_archivo)
+            else:
+                break
