@@ -14,13 +14,24 @@ def Recibir_Mensaje():
     print 'Recibiendo mensaje: '+ message
     message= message.split(',')
     syn, ack, modo, archivo= int(message[0]), int(message[1]), int(message[2]), message[3]
-    #Si es un handshake:
+    
+    #1. En caso de recibir un mensaje de no encontrado:
+    if (archivo=='404'):
+        print 'El archivo no fue encontrado :('
+    #2. Si es un handshake:
     if (ack==1):
         return 1
     else:
-        # Si es una solicitud del server:
+        # 3. Si es una solicitud del server:
         if (modo==1):
-            print 'Buscando archivo...'
+            print 'Buscando archivo...\n'
+            # TODO: Buscar archivo y enviarlo de vuelta:
+            
+            
+        # 4. Si es el archivo solicitado:
+        else:
+            print 'Archivo recibido :)'
+            print archivo
 
 def Solicitar_Archivo(nombre):
     #s = socket.socket()
