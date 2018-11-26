@@ -14,7 +14,7 @@ def Solicitar_Archivo(nombre):
     #port = 54321
     
     #s.connect((host,port))
-    s.send('0,0,0,'+nombre)
+    s.send('0,0,0,'+ nombre)
     
     
 s = socket.socket()         # Create a socket object

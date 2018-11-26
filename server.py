@@ -34,24 +34,25 @@ def Start_Server():
        c.send('Thank you for connecting')
        
        # Leyendo el mensaje:
-       mesage= c.recv(1024)
-       mesage= mesage.split(',')
-       syn, ack, modo, archivo= int(mesage[0]), int(mesage[1]), int(mesage[2]), mesage[3]
+       while True:
+           mesage= c.recv(1024)
+           mesage= mesage.split(',')
+           syn, ack, modo, archivo= int(mesage[0]), int(mesage[1]), int(mesage[2]), mesage[3]
+           
+           #Accion dependiendo del mensaje:
+           #Si es un archivo:
+           if (modo==0):
+               # Verificando handshake:
+                  if (syn==1):
+                      if (ack==0):
+                          print 'Error with handshake. Sending message again.'
+                      else:
+                          syn=0
+                          ack=0
+           mens = str(syn) + ' ' + str(ack) + ' ' + str(modo) + ' ' + archivo              
+           c.send(mens)               
+           print syn, ack, modo, archivo
        
-       #Accion dependiendo del mensaje:
-       #Si es un archivo:
-       if (modo==0):
-           # Verificando handshake:
-              if (syn==1):
-                  if (ack==0):
-                      print 'Error with handshake. Sending message again.'
-                  else:
-                      syn=0
-                      ack=0
-       mens = str(syn) + str(ack) + str(modo) + archivo              
-       c.send(mens)               
-       print syn, ack, modo, archivo
-       continue
                   
 
 
