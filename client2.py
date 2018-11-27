@@ -1,24 +1,25 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Nov 26 20:36:40 2018
-
-@author: gus19
-"""
-
-# -*- coding: utf-8 -*-
-"""
 Created on Sun Nov 25 22:08:34 2018
 
 @author: gus19
 """
 #Create socket: s = socket.socket (socket_family, socket_type, protocol=0)
-
+from thread import *
+import threading 
 import socket               # Import socket module
+
+def Escuchar():
+    while True:
+            hs=Recibir_Mensaje()
+            if hs:
+                s.send('0,0,1,'+n_archivo)
+            else:
+                break
 
 def Recibir_Mensaje():
     
     message=s.recv(1024)
-    print 'Recibiendo mensaje: '+ message
     message= message.split(',')
     syn, ack, modo, archivo= int(message[0]), int(message[1]), int(message[2]), message[3]
     
@@ -31,8 +32,12 @@ def Recibir_Mensaje():
     else:
         # 3. Si es una solicitud del server:
         if (modo==1):
-            print 'Buscando archivo...\n'
+            print 'Buscando archivo: '+archivo+'\n'
             # TODO: Buscar archivo y enviarlo de vuelta:
+            if False:
+                print 'aqui encontre el archivo'
+            else:
+                print 'Archivo no encontrado'
             
             
         # 4. Si es el archivo solicitado:
@@ -46,6 +51,7 @@ def Solicitar_Archivo(nombre):
     #port = 54321
     
     #s.connect((host,port))
+    print 'Solicitando archivo: '+nombre
     s.send('1,0,1,'+ nombre)
 
 def Desconectar():
@@ -55,8 +61,11 @@ def Desconectar():
 def Conectar():
 
     host = socket.gethostname() # Get local machine name
-    port = 54321               # Reserve a port for your service.
-    s.connect((host, port))
+    port = 12345               # Reserve a port for your service.
+    try:
+        s.connect((host, port))
+    except:
+        print 'Error: El servidor no está encendido.'
 
 #Main:
 s = socket.socket()         # Create a socket object
@@ -70,9 +79,5 @@ while True:
     else:
         n_archivo=raw_input("Ingrese nombre del archivo solicitado: ")
         Solicitar_Archivo(n_archivo)
-        while True:
-            hs=Recibir_Mensaje()
-            if hs:
-                s.send('0,0,1,'+n_archivo)
-            else:
-                break
+        t=threading.Thread(target=Escuchar)
+        t.start()

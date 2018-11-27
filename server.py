@@ -14,6 +14,13 @@ import threading
   
 print_lock = threading.Lock() 
   
+  
+def PreguntarATodos(archivo):
+    for i in Clientes:
+        Preguntar_ip(i,archivo)
+def Preguntar_ip(ip, archivo):
+    print 'preguntado a ip: '+ip
+    
 # thread fuction 
 def threaded(c): 
     while True: 
@@ -42,7 +49,7 @@ def Start_Server():
     print 'Starting Server'
     s = socket.socket()
     host = socket.gethostname()
-    port = 54321
+    port = 12345
     try:
         print 'Binding to the port',port
         s.bind((host, port))
@@ -60,7 +67,8 @@ def Start_Server():
        #print_lock.acquire()
        ip, port2 = str(addr[0]), str(addr[1])
        print 'Got connection from', ip,'at port',port2
-       t=threading.Thread(target=Recibir_Mensaje, args=(c,))
+       Clientes[ip]=[port2]
+       t=threading.Thread(target=Recibir_Mensaje, args=(c,ip,))
        threads.append(t)
        t.start()
     s.close()       
@@ -68,7 +76,7 @@ def Start_Server():
       
       
       
-def Recibir_Mensaje(c):
+def Recibir_Mensaje(c,ip):
        
        # Leyendo el mensaje:
        while True:
@@ -96,7 +104,10 @@ def Recibir_Mensaje(c):
                       else:
                           print 'Error en handshake. Se perdió la conección?'
                   else:
+                      Clientes[ip]=archivo
+                      print Clientes[ip]
                       print 'Asking for "' + archivo +'" to other hosts...'
+                      PreguntarATodos(archivo)
                       break
                       # TODO: Preguntar a demas clientes:
                       
@@ -104,6 +115,7 @@ def Recibir_Mensaje(c):
            else:
                # 3. Si ya se terminó la comunicación:
                if (archivo=='chao'):
+                   del Clientes[ip]
                    break
                
                #4. Si es un archivo solicitado:
@@ -118,6 +130,7 @@ def Recibir_Mensaje(c):
        
                   
 #Main:
+Clientes = {}
 
 Start_Server()
 
